@@ -125,7 +125,7 @@ class BGK_Htransport(object):
                 self.nu[i,j] = self.nu[i,j]/np.power(self.cd['kb']*T, 1.5)
                 self.nu[j,i] = self.nu[i,j]
         for i in range(ndens.shape[0]):
-            self.nu[i, :] = self.nu[i, :]/(self.mass[i]*ndens[i])
+            self.nu[i, :] = self.cd['kc']*self.cd['kc']*self.nu[i, :]/(self.mass[i]*ndens[i])
     
 
     def set_hydro_nut(self, T, ndens):
@@ -154,13 +154,12 @@ class BGK_Htransport(object):
                 self.nu[i,j] = self.nu[i,j]*np.power(self.zsolver.zbars[i]*\
                                self.zsolver.zbars[j]*self.cd['e']*self.cd['e'],
                                 2.0)
-                self.nu[i,j] = self.nu[i,j]*np.sqrt(self.mass[i]*self.mass[j]/\
-                                    (self.mass[i] + self.mass[j]))
+                self.nu[i,j] = self.nu[i,j]*np.sqrt(self.mass[i]*self.mass[j])
+                self.nu[i,j] = self.nu[i,j]*np.power(self.mass[i] + self.mass[j],-1.5)
                 self.nu[i,j] = ndens[i]*ndens[j]*self.nu[i,j]/np.power(self.cd['kb']*T, 1.5)
                 self.nu[j,i] = self.nu[i,j]
         for i in range(ndens.shape[0]):
-            self.nu[i, :] = self.nu[i, :]/ndens[i]
-
+            self.nu[i, :] = self.cd['kc']*self.cd['kc']*self.nu[i, :]/ndens[i]
 
     def set_mus(self, T, ndens):
         """Set the shear viscosity coefficient in `self.tdict`.
