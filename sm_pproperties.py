@@ -124,9 +124,9 @@ def get_lambdae(T, Zbar, ndens, cd, o=3):
         le = 3.0*np.pi*np.pi*le
         le = cd['hbar']*cd['hbar']*np.power(le, 2.0/3.0)/(3.0*cd['me'])
         if o == 1:
-            le = np.sqrt(T**2 + le**2)
+            le = np.sqrt((cd['kb']*T)**2 + le**2)
         elif o==2:
-            le = np.power(np.power(T, 9.0/5.0) + np.power(le, 9.0/5.0), 5.0/9.0)
+            le = np.power(np.power(cd['kb']*T, 9.0/5.0) + np.power(le, 9.0/5.0), 5.0/9.0)
         le= 4.0*np.pi*cd['e']*cd['e']*np.sum(Zbar*ndens)/le
     else:
         le = np.pi*np.pi*le/np.sqrt(2.0*(cd['kb']*T)**3)

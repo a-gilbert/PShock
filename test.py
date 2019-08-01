@@ -7,10 +7,22 @@ from constants import si_const
 import numpy as np
 import matplotlib.pyplot as plt
 
-test_zbar = False
-test_fermi = False
-test_csection = False
+test_zbar = True
+test_fermi = True
+test_csection = True
 test_bmus = True
+
+
+def get_thermovars(cd, zbar, kappa, gamma):
+   T = cd['hbar']*cd['hbar']*np.power(0.25*9*np.pi*zbar, 2.0/3.0)
+   T = T/(cd['e']*cd['e']*zbar*zbar*3.0*cd['me'])
+   ndens = 9/(kappa**4) - (1.0/gamma/gamma)
+   ndens = 1/np.sqrt(ndens)
+   ndens = T*ndens
+   T = cd['kc']*cd['e']*cd['e']*zbar*zbar/(ndens*gamma*cd['kb'])
+   ndens = 0.75/(np.pi * (ndens**3))
+   return ndens, T
+
 
 #get plasma frequency
 def get_pfreq(cd, zbar, n, m):
@@ -82,31 +94,23 @@ if test_bmus:
    #Test BGK Transport
    #mh in kg
    mh = 1.673823378528e-27
-   #dens in 1/m^{3}
-   n = 1e25
-   a = np.power(0.75/np.pi/n, 1.0/3.0)
-   mus = []
-   gammas = []
-   T = np.logspace(1, 4, num=50)
+   m = np.array([mh], dtype=np.double)
    z = np.array([1.0], dtype=np.double)
-   mass = np.array([mh], dtype=np.double)
    mfrac = np.array([1.0], dtype=np.double)
-   t = BGK_Htransport(si_const, mass, z, T[0], 
-                      mh*n, mfrac)
-   for i in range(T.shape[0]):
-      t.set_transport(T[i], mh*n, mfrac)
-      #wp = get_pfreq(t.cd, t.zsolver.zbars[0], n, mh)
-      wp = get_pfreq(t.cd, t.zsolver.zbars[0], n, mh)
-      wp = mh*n*wp*a*a
-      g = (t.zsolver.zbars[0]*t.cd['e'])**2
-      g = g*t.cd['kc']/a/(t.cd['kb']*T[i])
-      gammas.append(g)
+   #dens in 1/m^{3}
+   mus = []
+   gammas = np.logspace(0, 2, num=100)
+   ndens, T = get_thermovars(si_const, 1.0, 1.0, gammas[0])
+   t = BGK_Htransport(si_const, m, z, T, 
+                      mh*ndens, mfrac, o=2)
+   for i in range(gammas.shape[0]):
+      ndens, T = get_thermovars(si_const, 1.0, 1.0, gammas[i])
+      t.set_transport(T, mh*ndens, mfrac)
+      a = np.power(3.0/4.0/np.pi/ndens, 1.0/3.0)
+      wp = get_pfreq(t.cd, 1.0, ndens, mh)
+      wp = mh*ndens*wp*a*a
       mus.append(t.tdict['mus']/wp)
-   gammas = np.array(gammas, dtype=np.double)
    mus = np.array(mus, dtype=np.double)
-   gind = np.argsort(gammas)
-   mus[:] = mus[gind]
-   gammas[:] = gammas[gind]
    plt.close('all')
    plt.semilogx(gammas, mus, label='BGK')
    plt.ylabel(r'$\eta^{*}$')
