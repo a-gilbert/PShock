@@ -342,7 +342,7 @@ def get_calk_wc(n, m, g):
         The fit function. 
     """
     out = a[n][m][-1]
-    for i in range(4, 0, -1):
+    for i in range(3, -1, -1):
         out = a[n][m][i] + out*g
     out = g*out
     out = -0.25*n*float(math.factorial(m-1))*np.log(out)
