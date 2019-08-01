@@ -154,8 +154,8 @@ class BGK_Htransport(object):
                 self.nu[i,j] = self.nu[i,j]*np.power(self.zsolver.zbars[i]*\
                                self.zsolver.zbars[j]*self.cd['e']*self.cd['e'],
                                 2.0)
-                self.nu[i,j] = self.nu[i,j]*np.sqrt(self.mass[i]*self.mass[j]/\
-                                    (self.mass[i] + self.mass[j]))
+                self.nu[i,j] = self.nu[i,j]*np.sqrt(self.mass[i]*self.mass[j])
+                self.nu[i,j] = self.nu[i,j]*np.power(self.mass[i] + self.mass[j],-1.5)
                 self.nu[i,j] = ndens[i]*ndens[j]*self.nu[i,j]/np.power(self.cd['kb']*T, 1.5)
                 self.nu[j,i] = self.nu[i,j]
         for i in range(ndens.shape[0]):
