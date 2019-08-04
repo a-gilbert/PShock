@@ -112,7 +112,7 @@ class BGK_Htransport(object):
             for j in range(i, ndens.shape[0]):
                 self.nu[i, j] = self.zsolver.zbars[i]*self.zsolver.zbars[j]
                 self.nu[i,j] = self.nu[i,j]*self.cd['e']*self.cd['e']
-                self.nu[i,j] = self.nu[i,j]/leff/(self.cd['kb']*T)
+                self.nu[i,j] = self.cd['kc']*self.nu[i,j]/leff/(self.cd['kb']*T)
         self.nu = 128.0*np.pi*np.pi*get_calk(1, 1, self.nu)/3.0/np.power(2*np.pi, 1.5)
         #set each lower triangular element to its upper triangular equivalent
         for i in range(ndens.shape[0]):

@@ -60,7 +60,7 @@ def get_iradius(Zbar, ndens, cd):
     ai : (N,) np.ndarray
         Ion sphere radius for each species.
     """
-    ai = np.power(3*Zbar*cd['e']/(4*np.pi*np.sum(ndens*Zbar)), 1.0/3.0)
+    ai = np.power(3*Zbar/(4*np.pi*np.sum(ndens*Zbar)), 1.0/3.0)
     return ai
 
 
@@ -159,7 +159,7 @@ def get_gamma(T, Zbar, ndens, cd):
         Coupling parameter of each ion species.
     """
     gamma = get_iradius(Zbar, ndens, cd)
-    gamma = ((Zbar*cd['e'])**2)/gamma/(cd['kb']*T)
+    gamma = (cd['kc']*(Zbar*cd['e'])**2)/gamma/(cd['kb']*T)
     return gamma
 
 

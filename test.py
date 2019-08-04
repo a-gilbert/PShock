@@ -13,6 +13,36 @@ test_csection = True
 test_bmus = True
 
 
+#BGK data
+bgk_d = np.array([1.4399843471085645, 0.7984095427435388,
+1.4694520707580174, 0.7697813121272367,
+1.5199110829529336, 0.7395626242544733,
+1.551014420884441, 0.7141153081510935,
+1.6151436105580692, 0.6727634194831015,
+1.7047926105426938, 0.6266401590457257,
+1.799417603464236, 0.5757455268389663,
+1.8865130945543003, 0.5343936381709742,
+2.004715673882524, 0.49145129224652095,
+2.130324430141181, 0.44850894632206767,
+2.279141352544189, 0.40715705765407556,
+2.421944700849592, 0.3705765407554672,
+2.79092265216635, 0.30059642147117294,
+3.046989570903509, 0.26560636182902586,
+3.3265506079103524, 0.23538767395626248,
+3.656367612448139, 0.2051689860834991,
+4.156888048615193, 0.17335984095427437,
+4.954669185977836, 0.13677932405566606,
+6.447393309404349, 0.0970178926441353,
+11.065938946988735, 0.05089463220675938,
+13.828098465136152, 0.03817097415506965,
+22.485686862906295, 0.02226640159045723,
+38.07546021222374, 0.012723658051689957,
+68.51365336587746, 0.006361829025844923,
+88.55520163326842, 0.006361829025844923], dtype=np.double)
+
+bgk_g = bgk_d[0::2]
+bgk_mu = bgk_d[1::2]
+
 def get_thermovars(cd, zbar, kappa, gamma):
    T = cd['hbar']*cd['hbar']*np.power(0.25*9*np.pi*zbar, 2.0/3.0)
    T = T/(cd['e']*cd['e']*zbar*zbar*3.0*cd['me'])
@@ -99,10 +129,11 @@ if test_bmus:
    mfrac = np.array([1.0], dtype=np.double)
    #dens in 1/m^{3}
    mus = []
-   gammas = np.logspace(0, 2, num=100)
+   #gammas = np.logspace(0, 2, num=100)
+   gammas = bgk_g
    ndens, T = get_thermovars(si_const, 1.0, 1.0, gammas[0])
    t = BGK_Htransport(si_const, m, z, T, 
-                      mh*ndens, mfrac, o=2)
+                      mh*ndens, mfrac, s='T', o=3)
    for i in range(gammas.shape[0]):
       ndens, T = get_thermovars(si_const, 1.0, 1.0, gammas[i])
       t.set_transport(T, mh*ndens, mfrac)
@@ -113,7 +144,9 @@ if test_bmus:
    mus = np.array(mus, dtype=np.double)
    plt.close('all')
    plt.semilogx(gammas, mus, label='BGK')
+   plt.semilogx(bgk_g, bgk_mu, label='BGK_PAPER')
    plt.ylabel(r'$\eta^{*}$')
    plt.xlabel(r'$\Gamma$')
+   plt.legend()
    plt.savefig('bgk_visc.png')
 
